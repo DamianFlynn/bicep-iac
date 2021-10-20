@@ -14,6 +14,7 @@ var objResTags = union(defaultTags, tags)
 var strRGMon = 'p-mgt-mon'
 var strRGAuto = 'p-mgt-auto'
 var strRGGovLog = 'p-gov-log'
+var strRGMgtShl = 'p-mgt-shl'
 
 // ::
 // p-gov-log
@@ -70,7 +71,7 @@ module resStorageAudit '../../modules/storage/main.bicep' = {
           }
           {
             enabled: true
-            name: 'flowLogRetentionPolicy_2021-09-04 19:28:29.382'
+            name: 'flowLogRetentionPolicy'
             type: 'Lifecycle'
             definition: {
               actions: {
@@ -94,7 +95,7 @@ module resStorageAudit '../../modules/storage/main.bicep' = {
         ]
       }
     }
-    
+
   }
 }
 
@@ -117,6 +118,7 @@ module resAutomationAccount '../../modules/automation/automation.bicep' = {
   params: {
     tags: objResTags
     workspaceId: resWorkspace.outputs.id
+    storageId: resStorageAudit.outputs.id
   }
 }
 
@@ -181,10 +183,64 @@ module resWorkspaceAutomation '../../modules/workspace/automation.bicep' = {
 
 
 
+// ::
+// p-mgt-shl
+//
+// - res.arm.storage.shelll
 
+resource rgMgtShl 'Microsoft.Resources/resourceGroups@2021-01-01' = {
+  name: strRGMgtShl
+  location: location
+  tags: objResTags
+}
 
+module resStorageMgtShl '../../modules/storage/main.bicep' = {
+  scope: resourceGroup(rgMgtShl.name)
+  name: 'res.arm.storage.mgt.shell'
+  params: {
+    sku: 'Standard_GRS'
+    kind: 'StorageV2'
+    tags: objResTags
+    purpose: 'audit'
+    workspaceId: resWorkspace.outputs.id
+    managementPolicy: {
+      policy: {
+        rules:  [
+          {
+            enabled: true
+            name: 'TieringRule'
+            type: 'Lifecycle'
+            definition: {
+              actions: {
+                baseBlob: {
+                  tierToCool: {
+                    daysAfterModificationGreaterThan: 14
+                  }
+                  tierToArchive: {
+                    daysAfterModificationGreaterThan: 32
+                  }
+                  delete: {
+                    daysAfterModificationGreaterThan: 2563
+                  }
+                }
+                snapshot: {
+                  delete: {
+                    daysAfterCreationGreaterThan: 32
+                  }
+                }
+              }
+              filters: {
+                blobTypes: [
+                  'blockBlob'
+                ]
+              }
+            }
+          }
+          
+        ]
+      }
+    }
 
-
-
-
+  }
+}
 

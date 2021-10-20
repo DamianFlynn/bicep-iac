@@ -78,8 +78,20 @@ resource mainResource 'Microsoft.Storage/storageAccounts@2021-04-01' = {
     name:  sku
   }
   kind: kind
+
   properties: {
-     
+    accessTier: 'Hot' 
+    //Required for storage accounts where kind = BlobStorage. The access tier is used for billinh
+    minimumTlsVersion: 'TLS1_2'
+    supportsHttpsTrafficOnly: true
+    allowBlobPublicAccess: true
+    allowSharedKeyAccess: true
+    isHnsEnabled: false
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Allow'
+    }
+    largeFileSharesState: 'Disabled'
   }
 }
 
