@@ -48,3 +48,4 @@ output resources array = [for item in solutions: {
   name: item
 }]
 output resourceGroupName string = rgName
+output tags object = objResTags

@@ -1,0 +1,12 @@
+{ // Azure Policy is not compliant (Audit)
+  "name": "Azure Policy is not compliant (Audit)",
+  "description": "Azure Policy found Non-compliant resource(s) during audit.",
+  "enabled": "true",
+  "query": "AzureActivity|where CategoryValue=='Administrative' and Type=='AzureActivity' and OperationNameValue contains '/policies/'|extend p=todynamic(Properties)|where p.isComplianceCheck=='False'|extend policies=todynamic(tostring(p.policies))|mvexpand policy=policies|where policy.policyDefinitionEffect=~'Audit'|extend Policy=iff(isnull(tolong(policy.policyDefinitionReferenceId)),policy.policyDefinitionReferenceId,policy.policyDefinitionName)|project TimeGenerated,PolicyAssignment=policy.policyAssignmentName,Policy,Subscription=p.subscriptionId,ResourceGroup=tolower(p.resourceGroup),ResourceProvider=tolower(p.resourceProviderValue),Resource=p.resource,Caller,CallerIpAddress",
+  "frequency": 5,
+  "time": 5,
+  "severityLevel": "0", // 0 = Critical, 1 = Error, 2 = Warning, 3 = Informational, 4 = Verbose
+  "suppressTimeinMin": 20,
+  "operator": "GreaterThan",
+  "threshold": 0
+}

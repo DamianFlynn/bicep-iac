@@ -1,0 +1,12 @@
+{ // Azure Recommendation
+  "name": "Azure Recommendation",
+  "description": "Azure has one or more recommendation you should consider.",
+  "enabled": "true",
+  "query": "AzureActivity|where CategoryValue=='Recommendation'|extend p=todynamic(Properties)|extend Category=tostring(parse_json(Properties).recommendationCategory)|extend Impact=tostring(parse_json(Properties).recommendationImpact)|extend Recommendation=tostring(parse_json(Properties).recommendationName)|extend ResourceLink=tostring(parse_json(Properties).recommendationResourceLink)|project TimeGenerated,Category,Impact,Recommendation,ResourceLink,Subscription=p.subscriptionId,ResourceGroup=tolower(p.resourceGroup),ResourceProvider=tolower(p.resourceProviderValue),Resource=p.resource",
+  "frequency": 1440,
+  "time": 1440,
+  "severityLevel": "3",
+  "suppressTimeinMin": 20,
+  "operator": "GreaterThan",
+  "threshold": 0
+}

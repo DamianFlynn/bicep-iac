@@ -1,0 +1,12 @@
+{ // All Azure Windows Virtual Machines
+  "displayName": "All Azure Windows Virtual Machines",
+  "name": "2a67fe1c-47b9-48f4-99fb-35a277187d96",
+  "category": "VDC - Virtual Machines",
+  "query": "VMComputer|where OperatingSystemFamily=='windows' and HostingProvider=='azure' and Type=='VMComputer' and TimeGenerated>=ago(24h)|distinct Computer",
+  "tags": [
+    {
+      "Name": "Group",
+      "Value": "Computer"
+    }
+  ]
+}

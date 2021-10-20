@@ -54,6 +54,25 @@ param storageId string = ''
 @description('The Log Analytics Workspace ID which will be associated with the automation account.')
 param workspaceId string
 
+@description('Required for storage accounts where kind = BlobStorage. The access tier is used for billinh. Defaults to Hot')
+param accessTier string = 'Hot'
+
+@description('Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Possible values are any combination of Logging|Metrics|AzureServices, (For example, "Logging","Metrics"), or None to bypass None of those traffics')
+@allowed([
+  'None'
+  'Metrics'
+  'Logging'
+  'AzureServices'
+])
+param networkACLBypass string = 'None'
+
+@description('Select the default action to Allow or Deny when no other rules match')
+@allowed([
+  'Deny'
+  'Allow'
+])
+param networkACLDefaultAction string = 'Allow'
+
 // Standard Module Variables
 var objResTags = union(defaultTags, tags)
 var rgName = toLower(resourceGroup().name)
@@ -80,16 +99,14 @@ resource mainResource 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   kind: kind
 
   properties: {
-    accessTier: 'Hot' 
-    //Required for storage accounts where kind = BlobStorage. The access tier is used for billinh
+    accessTier: accessTier
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: true
     allowSharedKeyAccess: true
-    isHnsEnabled: false
     networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Allow'
+      bypass: networkACLBypass
+      defaultAction: networkACLDefaultAction
     }
     largeFileSharesState: 'Disabled'
   }
@@ -290,3 +307,4 @@ output name string = mainResourceName
 output storageId string = mainResource.id
 output storageName string = mainResourceName
 output resourceGroupName string = rgName
+output tags object = objResTags

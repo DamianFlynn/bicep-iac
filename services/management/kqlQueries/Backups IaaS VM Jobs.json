@@ -1,0 +1,6 @@
+{ // All Azure IaaS VM Backup Jobs
+  "displayName": "All Azure IaaS VM Backup Jobs",
+  "name": "9e460f43-0fd9-4701-8cdd-49aac5816108",
+  "category": "VDC - Azure Backup",
+  "query": "AzureDiagnostics | where Category == 'AzureBackupReport' and JobOperation_s == 'Backup' and BackupManagementType_s == 'IaaSVM' and ProtectedServerUniqueId_s != '' | sort by TimeGenerated desc"
+}

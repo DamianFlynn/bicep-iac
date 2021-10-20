@@ -1,0 +1,12 @@
+{ // All Azure Linux Virtual Machines
+  "displayName": "All Azure Linux Virtual Machines",
+  "name": "438c99d1-32f6-434a-b95a-11435572c9f9",
+  "category": "VDC - Virtual Machines",
+  "query": "VMComputer|where OperatingSystemFamily=='linux' and HostingProvider=='azure' and Type=='VMComputer' and TimeGenerated>=ago(24h)|distinct Computer",
+  "tags": [
+    {
+      "Name": "Group",
+      "Value": "Computer"
+    }
+  ]
+}

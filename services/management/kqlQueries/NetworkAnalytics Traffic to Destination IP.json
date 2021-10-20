@@ -1,0 +1,6 @@
+{ // All Flows To A Destination IP
+  "displayName": "All Flows To A Destination IP",
+  "name": "d375ae05-14f5-404a-be74-8ffbcd6dca49",
+  "category": "VDC - NSG Traffic Analytics",
+  "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' and AllowedInFlows_d > 0 | project SrcIP_s, DestIP_s, DestPort_d, FlowDirection_s, FlowType_s, FlowCount = max_of(AllowedInFlows_d + DeniedInFlows_d, AllowedOutFlows_d + DeniedOutFlows_d), AllowedInFlows_d, DeniedInFlows_d, AllowedOutFlows_d, DeniedOutFlows_d, InboundBytes_d, OutboundBytes_d, InboundPackets_d, OutboundPackets_d, VMIP_s, PublicIPs_s, L4Protocol_s, L7Protocol_s, NIC_s, VM_s, Subnet_s, Country_s, Region_s, Subscription_g, NSGRules_s, NSGList_s, TimeGenerated, TimeProcessed_t | where DestIP_s == '10.0.0.1' | sort by TimeGenerated desc"
+}

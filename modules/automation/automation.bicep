@@ -141,3 +141,4 @@ output name string = mainResourceName
 output automationId string = mainResource.id
 output automationName string = mainResourceName
 output resourceGroupName string = rgName
+output tags object = objResTags

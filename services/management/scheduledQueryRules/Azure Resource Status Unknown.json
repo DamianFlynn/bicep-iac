@@ -1,0 +1,12 @@
+{ // Azure Resource status is unknown
+  "name": "Azure Resource status is unknown",
+  "description": "One or more Azure resource(s) have changed from being available to a unknown status.",
+  "enabled": "true",
+  "query": "AzureActivity|where CategoryValue=='ResourceHealth'|extend p=todynamic(Properties)|extend Cause=tostring(parse_json(tostring(p.eventProperties)).cause)|extend Status=tostring(parse_json(tostring(p.eventProperties)).currentHealthStatus)|extend PreviousStatus=tostring(parse_json(tostring(p.eventProperties)).previousHealthStatus)|extend EventType=tostring(parse_json(tostring(p.eventProperties)).type)|extend Event=tostring(parse_json(tostring(p.eventProperties)).details)|extend ep=tostring(p.eventProperties)|extend i1=indexof(ep,'title')+8|extend s1=substring(ep,i1)|extend i2=indexof(s1,'\"')|extend Description=substring(s1,0,i2)|where Cause!='UserInitiated' and PreviousStatus=='Available' and Status=='Unknown'|project TimeGenerated,ActivityStatus=p.activityStatusValue,Cause,Status,Description,EventType,Event,Subscription=p.subscriptionId,ResourceGroup=tolower(p.resourceGroup),ResourceProvider=tolower(p.resourceProviderValue),Resource=p.resource",
+  "frequency": 5,
+  "time": 5,
+  "severityLevel": "2",
+  "suppressTimeinMin": 20,
+  "operator": "GreaterThan",
+  "threshold": 0
+}

@@ -1,0 +1,6 @@
+{ // All Heartbeats And Reported Solutions
+  "displayName": "All Heartbeats and Reported Solutions",
+  "name": "6afe1daa-791a-4bde-8485-4065825b3d91",
+  "category": "VDC - Log Analytics",
+  "query": "Heartbeat | summarize arg_max(TimeGenerated, Solutions, Computer) by Computer"
+}

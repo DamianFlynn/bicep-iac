@@ -1,0 +1,6 @@
+{ // All Received BGP Routes
+  "displayName": "All Received BGP Routes",
+  "name": "f1ffe415-a543-45bf-9420-ab40cc28f71c",
+  "category": "VDC - VPN Gateway",
+  "query": "AzureDiagnostics | where TimeGenerated > ago(24h) and OperationName == 'BgpRouteUpdate' and Resource == 'p-net-wan-vwan-[#_datacenter.001.name_#]-vpn' | summarize dcount(routes_s) by Resource, routes_s, peerAddress_s | project Resource, routes_s, peerAddress_s | sort by TimeGenerated desc"
+}

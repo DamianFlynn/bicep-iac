@@ -1,0 +1,12 @@
+{ // Azure service issue (Informational)
+  "name": "Azure service issue (Informational)",
+  "description": "Issues impacting management operations and/or latency, not impacting service availability. Please investigate.",
+  "enabled": "true",
+  "query": "AzureActivity|where CategoryValue=='ServiceHealth' and Level=='Informational'|extend IncidentType=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).incidentType)|extend Stage=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).stage)|where IncidentType=='Incident' and Stage=='Active'|extend StartTime=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).impactStartTime)|extend IssueName=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).defaultLanguageTitle)|extend TrackingId=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).trackingId)|extend Service=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).service)|extend Region=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).region)|extend Communication=tostring(parse_json(tostring(parse_json(Properties).eventProperties)).communication)|project StartTime,IssueName,TrackingId,SubscriptionId,Service,Region,Communication",
+  "frequency": 60,
+  "time": 60,
+  "severityLevel": "3",
+  "suppressTimeinMin": 20,
+  "operator": "GreaterThan",
+  "threshold": 0
+}

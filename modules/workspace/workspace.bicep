@@ -129,3 +129,4 @@ output workspaceId string = mainResource.id
 output workspaceName string = mainResourceName
 output workspaceCustomerId string = mainResource.properties.customerId
 output resourceGroupName string = rgName
+output tags object = objResTags

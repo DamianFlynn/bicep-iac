@@ -35,3 +35,4 @@ resource resourceName_automation 'Microsoft.OperationalInsights/workspaces/linke
 
 output id string = resourceName_automation.id
 output resourceGroupName string = rgName
+output tags object = objResTags

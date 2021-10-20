@@ -1,0 +1,6 @@
+{ // Traffic With Warnings By Application Firewall
+  "displayName": "Traffic With Warnings By Application Firewall",
+  "name": "24fb2b7f-f715-4ff5-bba1-bcdd7008fa12",
+  "category": "VDC - Application Firewall",
+  "query": "AzureDiagnostics | where Category == 'ApplicationGatewayFirewallLog' | where details_message_s contains 'Warning' and action_s == 'Matched' | sort by TimeGenerated desc"
+}

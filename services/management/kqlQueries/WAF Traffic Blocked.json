@@ -1,0 +1,6 @@
+{ // Traffic Blocked By Application Firewall
+  "displayName": "Traffic Blocked By Application Firewall",
+  "name": "3d7e587c-41dc-4d58-a3a6-d98311ea7c96",
+  "category": "VDC - Application Firewall",
+  "query": "AzureDiagnostics | where Category == 'ApplicationGatewayFirewallLog' | where action_s == 'Blocked' | sort by TimeGenerated desc"
+}
