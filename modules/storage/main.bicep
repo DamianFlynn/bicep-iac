@@ -92,6 +92,10 @@ var strWorkspaceName = last(split(workspaceId,'/'))
 resource mainResource 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: mainResourceName
   location: rgLocation
+  extendedLocation: {
+    name: extendLocationName
+    type: 'EdgeZone'
+  }
   tags: objResTags
   sku :{
     name:  sku
@@ -109,6 +113,7 @@ resource mainResource 'Microsoft.Storage/storageAccounts@2021-04-01' = {
       defaultAction: networkACLDefaultAction
     }
     largeFileSharesState: 'Disabled'
+    
   }
 }
 

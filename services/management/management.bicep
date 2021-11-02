@@ -16,6 +16,26 @@ var strRGAuto = 'p-mgt-auto'
 var strRGGovLog = 'p-gov-log'
 var strRGMgtShl = 'p-mgt-shl'
 
+
+// Establish Subscription Diagnostics
+module subscriptionDiagnostics '../../modules/subscription/diagnostics.bicep' = {
+  scope: subscription()
+  name: 'sub.mgt.diagnostics'
+  params: {
+    tags: objResTags
+    workspaceId: resWorkspace.outputs.id
+    storageId: resStorageAudit.outputs.id
+  }
+}
+
+module diag '../../modules/subscription/diagnostics.bicep' = {
+  name: 'testing'
+  params: {
+    workspaceId: resWorkspace.outputs.id
+    storageId: resStorageAudit.outputs.id
+  }
+}
+
 // ::
 // p-gov-log
 //
@@ -169,6 +189,8 @@ module resWorkspaceSolutions '../../modules/workspace/solutions.bicep' = {
   }
 }
 
+output workspaceId string = resWorkspace.outputs.id
+
 module resWorkspaceAutomation '../../modules/workspace/automation.bicep' = {
   scope: resourceGroup(rgMon.name)
   name: 'res.arm.workspace.automation'
@@ -179,23 +201,23 @@ module resWorkspaceAutomation '../../modules/workspace/automation.bicep' = {
 }
 
 
-//
+
 module resWorkspaceQueries '../../modules/workspace/queries.bicep' = {
   scope: resourceGroup(rgMon.name)
   name: 'res.arm.workspace.queries'
   params: {
     queries: [
-      json(loadTextContent('./kqlQueries/AzureFirewall Traffic from Source IP.json'))
-      json(loadTextContent('./kqlQueries/AzureFirewall Traffic to Destination IP.json'))
-      json(loadTextContent('./kqlQueries/Backups IaaS VM Jobs.json'))
-      json(loadTextContent('./kqlQueries/Heartbeats Reported Solutions.json'))
-      json(loadTextContent('./kqlQueries/Network BGP Received Routes.json'))
-      json(loadTextContent('./kqlQueries/NetworkAnalytics Flows from Source IP.json'))
-      json(loadTextContent('./kqlQueries/NetworkAnalytics Traffic to Destination IP.json'))
-      json(loadTextContent('./kqlQueries/VirtualMachine Windows.json'))
-      json(loadTextContent('./kqlQueries/VirtualMachine Linux.json'))
-      json(loadTextContent('./kqlQueries/WAF Traffic Blocked.json'))
-      json(loadTextContent('./kqlQueries/WAF Traffic With Warnings.json'))
+//      json(loadTextContent('./kqlQueries/AzureFirewall Traffic from Source IP.json'))
+//      json(loadTextContent('./kqlQueries/AzureFirewall Traffic to Destination IP.json'))
+//      json(loadTextContent('./kqlQueries/Backups IaaS VM Jobs.json'))
+//      json(loadTextContent('./kqlQueries/Heartbeats Reported Solutions.json'))
+//      json(loadTextContent('./kqlQueries/Network BGP Received Routes.json'))
+//      json(loadTextContent('./kqlQueries/NetworkAnalytics Flows from Source IP.json'))
+//      json(loadTextContent('./kqlQueries/NetworkAnalytics Traffic to Destination IP.json'))
+//      json(loadTextContent('./kqlQueries/VirtualMachine Windows.json'))
+//      json(loadTextContent('./kqlQueries/VirtualMachine Linux.json'))
+//      json(loadTextContent('./kqlQueries/WAF Traffic Blocked.json'))
+//      json(loadTextContent('./kqlQueries/WAF Traffic With Warnings.json'))
     ] 
     workspaceId: resWorkspace.outputs.id
   }
@@ -230,6 +252,11 @@ module actionGroupErrors '../../modules/actiongroup/actiongroup.bicep' = {
     ]
   }
 }
+
+output actionGroupErrorsName string = actionGroupErrors.outputs.name
+output actionGroupErrorsId string = actionGroupErrors.outputs.id
+output actionGroupErrorsRG string = actionGroupErrors.outputs.resourceGroupName
+
 
 module resWorkspaceScheduledQueryErrors '../../modules/scheduledqueryrules/scheduledqueryrules.bicep' = {
   scope: resourceGroup(rgMon.name)
@@ -372,6 +399,35 @@ module resWorkspaceScheduledQueryInfo '../../modules/scheduledqueryrules/schedul
 }
 
 
+module resWorkbooks '../../modules/workbooks/workbooks.bicep' = {
+  scope: resourceGroup(rgMon.name)
+  name: 'res.arm.workbooks'
+  params: {
+    workbooks: [
+      {
+        name: 'Azure Network Overview'
+        category: 'Workbooks'
+        sourceId: 'Azure Firewall'
+        serializedData: loadTextContent('./workbooks/Azure Network.json')
+        version: 'Notebook/1.0'
+      }
+      {
+        name: 'Azure VDC Overview'
+        category: 'Workbooks'
+        sourceId: 'Overview'
+        serializedData: loadTextContent('./workbooks/VDC Overview.json')
+        version: 'Notebook/1.0'
+      }
+      //json(loadTextContent('./workbooks/Azure Firewall.json'))
+      //json(loadTextContent('./workbooks/Azure Inventory.json'))
+      //json(loadTextContent('./workbooks/Azure Backup Report.json'))
+      
+      //json()
+      //json(loadTextContent('./workbooks/Virtual Machine Health.json'))
+      //json(loadTextContent('./workbooks/VM Updates.json'))
+    ]
+  }
+}
 
 // ::
 // p-mgt-shl
@@ -415,3 +471,4 @@ module resStorageMgtShlFileshare '../../modules/storage/fileshares.bicep' = {
 
 
 output tags object = objResTags
+

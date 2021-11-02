@@ -1,0 +1,1157 @@
+{ 
+  "displayName": "Azure Network",
+  "content": {
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 1,
+        "name": "MainTitle",
+        "content": {
+          "json": "## Azure Network\r\n---"
+        }
+      },
+      {
+        "type": 11,
+        "name": "MainLinks",
+        "customWidth": "60",
+        "content": {
+          "version": "LinkItem/1.0",
+          "style": "tabs",
+          "links": [
+            {
+              "id": "91d1e829-1620-49c2-9828-836836b0983a",
+              "cellValue": "selectedTab",
+              "linkTarget": "parameter",
+              "linkLabel": "Flow log search",
+              "subTarget": "LogSearch",
+              "preText": "Traffic flow log search",
+              "style": "link"
+            },
+            {
+              "id": "c1923a1b-0a33-475a-a342-f8c762b21d15",
+              "cellValue": "selectedTab",
+              "linkTarget": "parameter",
+              "linkLabel": "Traffic flow",
+              "subTarget": "TrafficFlows",
+              "style": "link"
+            },
+            {
+              "id": "cea85cd8-aed9-43cd-97fc-88abe7e17f09",
+              "cellValue": "selectedTab",
+              "linkTarget": "parameter",
+              "linkLabel": "Malicious traffic",
+              "subTarget": "MaliciousTraffic",
+              "style": "link"
+            }
+          ]
+        }
+      },
+      {
+        "type": 9,
+        "name": "MainParameters",
+        "customWidth": "40",
+        "content": {
+          "version": "KqlParameterItem/1.0",
+          "crossComponentResources": [
+            "value::selected"
+          ],
+          "parameters": [
+            {
+              "id": "01afeffb-5ade-42b4-8ce9-e648b880e5a5",
+              "version": "KqlParameterItem/1.0",
+              "name": "TimeRange",
+              "label": "Time range",
+              "type": 4,
+              "value": {
+                "durationMs": 14400000
+              },
+              "isRequired": true,
+              "isGlobal": true,
+              "typeSettings": {
+                "selectableValues": [
+                  {
+                    "durationMs": 300000
+                  },
+                  {
+                    "durationMs": 900000
+                  },
+                  {
+                    "durationMs": 1800000
+                  },
+                  {
+                    "durationMs": 3600000
+                  },
+                  {
+                    "durationMs": 14400000
+                  },
+                  {
+                    "durationMs": 43200000
+                  },
+                  {
+                    "durationMs": 86400000
+                  },
+                  {
+                    "durationMs": 172800000
+                  },
+                  {
+                    "durationMs": 259200000
+                  },
+                  {
+                    "durationMs": 604800000
+                  },
+                  {
+                    "durationMs": 1209600000
+                  },
+                  {
+                    "durationMs": 2419200000
+                  },
+                  {
+                    "durationMs": 2592000000
+                  },
+                  {
+                    "durationMs": 5184000000
+                  },
+                  {
+                    "durationMs": 7776000000
+                  }
+                ],
+                "allowCustom": true
+              }
+            },
+            {
+              "id": "add90eb3-ff5f-4b19-9658-ff15c8043af5",
+              "version": "KqlParameterItem/1.0",
+              "name": "Workspaces",
+              "label": "Workspaces",
+              "type": 5,
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "where type =~ 'microsoft.operationalinsights/workspaces' | project id, name | sort by name asc",
+              "crossComponentResources": [
+                "value::selected"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::100"
+                ],
+                "showDefault": false
+              },
+              "defaultValue": "value::100",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            {
+              "id": "5084e141-6c56-4d7f-bd8a-09f7ef9af1bc",
+              "version": "KqlParameterItem/1.0",
+              "name": "Resource",
+              "label": "NSG",
+              "type": 5,
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "where type =~ 'Microsoft.Network/networkSecurityGroups' | project id, name | sort by name asc",
+              "crossComponentResources": [
+                "value::selected"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::100"
+                ],
+                "showDefault": false
+              },
+              "defaultValue": "value::100",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            }
+          ],
+          "style": "pills",
+          "queryType": 0,
+          "resourceType": "microsoft.resourcegraph/resources"
+        }
+      },
+      {
+        "type": 9,
+        "name": "LogSearchParameters",
+        "content": {
+          "version": "KqlParameterItem/1.0",
+          "parameters": [
+            {
+              "id": "9d990d39-4b77-43e2-84c7-58e6875e8cb0",
+              "version": "KqlParameterItem/1.0",
+              "name": "NSGRule",
+              "label": "Rule",
+              "type": 2,
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | distinct NSGRule_s | sort by NSGRule_s asc",
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "selectAllValue": "All",
+                "showDefault": false
+              },
+              "defaultValue": "value::all",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ]
+            },
+            {
+              "id": "b919b24f-4570-4be4-bcf8-774e87fb509f",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowDirection",
+              "label": "Direction",
+              "type": 10,
+              "description": "Traffic flow direction",
+              "isRequired": true,
+              "value": "All",
+              "typeSettings": {
+                "additionalResourceOptions": [],
+                "showDefault": false
+              },
+              "jsonData": "[\"All\",\"Inbound\",\"Outbound\"]",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange"
+            },
+            {
+              "id": "44b0fb00-eaf6-4c1c-a524-9d086d808b25",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowAction",
+              "label": "Action",
+              "type": 10,
+              "description": "Rule Action",
+              "isRequired": true,
+              "value": "All",
+              "typeSettings": {
+                "additionalResourceOptions": [],
+                "showDefault": false
+              },
+              "jsonData": "[\"All\",\"Allow\",\"Deny\"]",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange"
+            },
+            {
+              "id": "f8ff9505-474a-4034-bb28-e058a9e28157",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowSource",
+              "label": "Source",
+              "type": 1,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "value": ""
+            },
+            {
+              "id": "27f99fa6-0913-4a8c-89f4-4dbda4c8d1d3",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowDestination",
+              "label": "Destination",
+              "type": 1,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange"
+            },
+            {
+              "id": "c5589993-3cd2-4fe1-b0a5-770575b16b7e",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowPort",
+              "label": "Port",
+              "type": 2,
+              "isRequired": true,
+              "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | distinct DestPort_d | project DestPort_d | sort by DestPort_d asc",
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "selectAllValue": "All",
+                "showDefault": false
+              },
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "defaultValue": "value::all",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ]
+            },
+            {
+              "id": "a0965506-7896-4138-8547-d1fd4f3ae419",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowLayer4",
+              "label": "Layer 4",
+              "type": 10,
+              "isRequired": true,
+              "value": "All",
+              "typeSettings": {
+                "additionalResourceOptions": [],
+                "showDefault": false
+              },
+              "jsonData": "[\"All\",\"TCP\",\"UDP\"]",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange"
+            },
+            {
+              "id": "a5bec35c-5d49-4f93-9819-b495ee2c750f",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowLayer7",
+              "label": "Layer 7",
+              "type": 2,
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | distinct L7Protocol_s | project L7Protocol_s | sort by L7Protocol_s asc",
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "selectAllValue": "All",
+                "showDefault": false
+              },
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "defaultValue": "value::all",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ]
+            },
+            {
+              "id": "0e16370c-22df-4dfa-a389-4f7d82c4038e",
+              "version": "KqlParameterItem/1.0",
+              "name": "FlowType",
+              "label": "Flow type",
+              "type": 2,
+              "isRequired": true,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | distinct FlowType_s | project FlowType_s | sort by FlowType_s asc",
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "selectAllValue": "All",
+                "showDefault": false
+              },
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "defaultValue": "value::all",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ]
+            }
+          ],
+          "style": "pills",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "LogSearch"
+        }
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | extend FlowDirection = iff(FlowDirection_s == 'I', 'Inbound', 'Outbound'), Action = iif(FlowStatus_s == 'A', 'Allow', 'Deny'), Layer4 = iff(L4Protocol_s == 'T', 'TCP', iff(L4Protocol_s == 'U', 'UDP', tostring(L4Protocol_s))), PublicIP = split(PublicIPs_s, '|')[0] | extend Source = iif(isempty(SrcIP_s), PublicIP, SrcIP_s), Destination = iif(isempty(DestIP_s), PublicIP, DestIP_s) | where '{NSGRule:label}' == 'All' or ('{NSGRule:label}' contains ',' and NSGRule_s in (split('{NSGRule:label}', ', '))) or NSGRule_s == '{NSGRule:label}' | where '{FlowDirection:label}' == 'All' or FlowDirection == '{FlowDirection:label}' | where '{FlowAction:label}' == 'All' or Action == '{FlowAction:label}' | where isempty(\"{FlowSource}\") or Source like '{FlowSource:label}' | where isempty(\"{FlowDestination}\") or Destination like '{FlowDestination:label}' | where '{FlowPort:label}' == 'All' or DestPort_d == '{FlowPort:label}' | where '{FlowLayer4:label}' == 'All' or Layer4 == '{FlowLayer4:label}' | where '{FlowLayer7:label}' == 'All' or ('{FlowLayer7:label}' contains ',' and L7Protocol_s in (split('{FlowLayer7:label}', ', '))) or L7Protocol_s == '{FlowLayer7:label}' | where '{FlowType:label}' == 'All' or ('{FlowType:label}' contains ',' and FlowType_s in (split('{FlowType:label}', ', '))) or FlowType_s == '{FlowType:label}' | project TimeGenerated, NSG, Rule = NSGRule_s, FlowDirection, Action, Source, Destination, Port = DestPort_d, Layer4, Layer7 = L7Protocol_s, FlowType = FlowType_s | sort by TimeGenerated desc",
+          "size": 2,
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "showAnalytics": true,
+          "showExportToExcel": true,
+          "title": "Azure network analytics flow log (query {$queryTime} rows {$rowCount})",
+          "noDataMessage": "Found no matching events.",
+          "noDataMessageStyle": 2,
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "rowLimit": 10000,
+            "filter": true
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "LogSearch"
+        },
+        "name": "LogSearchQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'StatusMessage' and ComponentType_s == 'Topology' and Status_s == 'Completed' and ('{Resource:label}' == 'All' or ('{Resource:subscriptionid}' contains ',' and Subscription_g in~ (split('{Resource:subscriptionid}', ', '))) or Subscription_g == '{Resource:subscriptionid}') | project Subscription_g, DiscoveryRegion_s, TimeProcessed_t | where isnotempty(Subscription_g) and isnotempty(DiscoveryRegion_s) and isnotempty(TimeProcessed_t) | summarize arg_max(TimeProcessed_t, *) by Subscription_g | project Subscription_g, DiscoveryRegion_s, TimeProcessed_t | join kind = inner (AzureNetworkAnalytics_CL | where SubType_s == 'Topology' and ResourceType == 'NetworkInterface') on Subscription_g, DiscoveryRegion_s, TimeProcessed_t | project Subscription_g, Name_s, VMName = VirtualMachine_s | join kind = leftouter (AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' and not(isempty(NIC1_s)) | summarize AllowedOutFlows = sum(AllowedOutFlows_d), DeniedOutFlows = sum(DeniedOutFlows_d) by Subscription_g = Subscription1_g, Name_s = NIC1_s) on Subscription_g, Name_s | project-away Subscription_g1, Name_s1 | join kind = leftouter (AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' and not(isempty(NIC2_s)) | summarize AllowedInFlows = sum(AllowedInFlows_d), DeniedInFlows = sum(DeniedInFlows_d) by Subscription_g = Subscription2_g, Name_s = NIC2_s) on Subscription_g, Name_s | project-away Subscription_g1, Name_s1 | extend NICRGandName = split(Name_s, '/'), VMRGandName = split(VMName, '/') | extend NICResourceId = strcat('/subscriptions/', Subscription_g, '/resourceGroups/', NICRGandName[0], '/providers/Microsoft.Network/networkInterfaces/', NICRGandName[1]), VMResourceId = strcat('/subscriptions/', Subscription_g, '/resourceGroups/', VMRGandName[0], '/providers/Microsoft.Compute/virtualMachines/', VMRGandName[1]) | project VMResourceId, NICResourceId, AllowedOutFlows, DeniedOutFlows, AllowedInFlows, DeniedInFlows, Name_s | sort by AllowedOutFlows + DeniedOutFlows + AllowedInFlows + DeniedInFlows desc nulls last",
+          "size": 0,
+          "title": "Virtual machines (select to see traffic for one machine)",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "exportFieldName": "Name_s",
+          "exportParameterName": "SelectedNIC",
+          "exportDefaultValue": "All",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "AllowedOutFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "green",
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "DeniedOutFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "orange",
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "AllowedInFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "green",
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "DeniedInFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "orange",
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "Name_s",
+                "formatter": 5
+              }
+            ],
+            "rowLimit": 25,
+            "filter": true
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "TrafficFlows"
+        },
+        "customWidth": "70",
+        "name": "NICVMQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' and ('{SelectedNIC}' == NIC1_s or '{SelectedNIC}' == 'All') | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | summarize count() by FlowDirection = iff(FlowDirection_s == 'I', 'Inbound', 'Outbound')",
+          "size": 0,
+          "title": "Flow direction",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "TrafficFlows"
+        },
+        "customWidth": "30",
+        "name": "TrafficFlowDirectionQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' and ('{SelectedNIC}' == NIC1_s or '{SelectedNIC}' == 'All') | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | summarize TotalFlows = count() by TimeGenerated, VM_s | extend VM = strcat(split(VM_s, '/')[1], ' (', split(VM_s, '/')[0], ')') | project TimeGenerated, VM, TotalFlows",
+          "size": 0,
+          "title": "Virtual machines total flows",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "timechart",
+          "tileSettings": {
+            "showBorder": false,
+            "titleContent": {
+              "columnMatch": "VMResourceId",
+              "formatter": 1
+            },
+            "leftContent": {
+              "columnMatch": "TotalFlows",
+              "formatter": 12,
+              "formatOptions": {
+                "palette": "auto"
+              },
+              "numberFormat": {
+                "unit": 17,
+                "options": {
+                  "maximumSignificantDigits": 3,
+                  "maximumFractionDigits": 2
+                }
+              }
+            }
+          },
+          "graphSettings": {
+            "type": 0,
+            "topContent": {
+              "columnMatch": "VMResourceId",
+              "formatter": 1
+            },
+            "centerContent": {
+              "columnMatch": "TotalFlows",
+              "formatter": 1,
+              "numberFormat": {
+                "unit": 17,
+                "options": {
+                  "maximumSignificantDigits": 3,
+                  "maximumFractionDigits": 2
+                }
+              }
+            }
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "TrafficFlows"
+        },
+        "customWidth": "70",
+        "name": "VMQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' and ('{SelectedNIC}' == NIC1_s or '{SelectedNIC}' == 'All') | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | summarize count() by FlowType_s",
+          "size": 0,
+          "title": "Flow types",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "TrafficFlows"
+        },
+        "customWidth": "30",
+        "name": "FlowTypesQuery"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## Malicious actors"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "name": "MaliciousTrafficTitle"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet', Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize FlowCount = sum(FlowCount_d), AllowedInFlows = sum(AllowedInFlows_d), DeniedInFlows = sum(DeniedInFlows_d) by IPAdress = strcat(SrcIP, ' (', CountryOrRegion, ')') | sort by AllowedInFlows desc",
+          "size": 0,
+          "title": "Malicious IP address communication",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "FlowCount",
+                "formatter": 5,
+                "formatOptions": {
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "AllowedInFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "red",
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "DeniedInFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "red",
+                  "showIcon": true
+                }
+              }
+            ]
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "50",
+        "name": "MaliciousCommunicationQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '')) | extend Subscription1 = iif(FlowType_s == 'InterVNet', Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize FlowCount = sum(FlowCount_d) by Country = CountryOrRegion | sort by FlowCount desc",
+          "size": 0,
+          "title": "Traffic country of origin",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "50",
+        "name": "CountryOriginQuery"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## Attacked resources"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "name": "AttackedTitle"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet', Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize AllowedInFlows = sum(AllowedInFlows_d) by Computer = strcat(Destination, ' (', VM2, ' - ', Subscription2, ')') | sort by AllowedInFlows desc",
+          "size": 0,
+          "title": "Most attacked machines",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "50",
+        "name": "MostAttackedVMsQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize AllowedInFlows = sum(AllowedInFlows_d) by Subnet = strcat(Subnet2, ' (', Subscription2, ')') | sort by AllowedInFlows desc",
+          "size": 0,
+          "title": "Most attacked subnets",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "50",
+        "name": "MostAttackedSubnetsQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize FlowCount = sum(FlowCount_d), AllowedInFlows = sum(AllowedInFlows_d), DeniedInFlows = sum(DeniedInFlows_d) by IPAddress = Destination, VM = VM2, Subnet = Subnet2, Subscription = Subscription2 | sort by AllowedInFlows desc | project IPAddress, VM, VNet = strcat(split(Subnet,'/')[0], '/', split(Subnet,'/')[0]), Subscription, FlowCount, AllowedInFlows, DeniedInFlows | extend VM = strcat('/subscriptions/', Subscription, '/resourceGroups/', split(VM,'/')[0], '/providers/Microsoft.Compute/virtualMachines/', split(VM,'/')[1]) | extend VNet = strcat('/subscriptions/', Subscription, '/resourceGroups/', split(VNet,'/')[0], '/providers/Microsoft.Network/virtualNetworks/', split(VNet,'/')[1])",
+          "size": 0,
+          "title": "Attacked resources",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "Subscription",
+                "formatter": 13,
+                "formatOptions": {
+                  "linkTarget": null,
+                  "showIcon": true
+                }
+              }
+            ]
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "name": "AttackedResourcesQuery"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## Malicious traffic target protocols"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "name": "MaliciousTrafficProtocolsTitle"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize FlowCount = sum(FlowCount_d), AllowedInFlows = sum(AllowedInFlows_d), DeniedInFlows = sum(DeniedInFlows_d) by L7Protocol = strcat(L7Protocol_s, ' (', toint(DestPort_d), ')') | sort by AllowedInFlows desc | limit 10",
+          "size": 0,
+          "title": "Malicious traffic, by application ports",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "FlowCount",
+                "formatter": 4,
+                "formatOptions": {
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "AllowedInFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "red",
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "DeniedInFlows",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "blue",
+                  "showIcon": true
+                }
+              }
+            ]
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "name": "MaliciousTrafficApplicationPortsQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize FlowCount = sum(FlowCount_d) by L4Protocol_s  | extend L4Protocol_s = replace('T', 'TCP', L4Protocol_s) | extend L4Protocol = replace('U', 'UDP', L4Protocol_s) | project L4Protocol , FlowCount",
+          "size": 0,
+          "title": "Malicious traffic protocols",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "33",
+        "name": "MaliciousTrafficProtocolsQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize AllowedInFlows = sum(AllowedInFlows_d) by L4Protocol_s | sort by AllowedInFlows desc | extend L4Protocol_s = replace('T', 'TCP', L4Protocol_s) | extend L4Protocol = replace('U', 'UDP', L4Protocol_s) | project L4Protocol, AllowedInFlows",
+          "size": 0,
+          "title": "Allowed malicious traffic",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "33",
+        "name": "AllowedMaliciousTrafficQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize DeniedInFlows = sum(DeniedInFlows_d) by L4Protocol_s | sort by DeniedInFlows desc | extend L4Protocol_s = replace('T', 'TCP', L4Protocol_s) | extend L4Protocol = replace('U', 'UDP', L4Protocol_s) | project L4Protocol, DeniedInFlows",
+          "size": 0,
+          "title": "Denied malicious traffic",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "33",
+        "name": "DeniedMaliciousTrafficQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize FlowCount = sum(FlowCount_d) by L7Protocol = strcat(L7Protocol_s, ' (', toint(DestPort_d), ')') | sort by FlowCount desc | limit 10",
+          "size": 0,
+          "title": "Malicious traffic, by application port",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "33",
+        "name": "MaliciousTrafficApplicationPortQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize AllowedInFlows = sum(AllowedInFlows_d) by L7Protocol = strcat(L7Protocol_s, ' (', toint(DestPort_d), ')')  | sort by AllowedInFlows desc | limit 10",
+          "size": 0,
+          "title": "Allowed malicious traffic, by application port",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "33",
+        "name": "AllowedMaliciousTrafficApplicationPortQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend Subnet1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet1_s, iif(FlowDirection_s == 'O',  Subnet_s, '' )), Subnet2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), Subnet2_s, iif(FlowDirection_s == 'I', Subnet_s, '' )) | extend VM1 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM1_s, iif(FlowDirection_s == 'O', VM_s, '' )), VM2 = iif(FlowType_s in ('InterVNet','IntraVNet'), VM2_s, iif(FlowDirection_s == 'I', VM_s, '' )) | extend Subscription1 = iif(FlowType_s == 'InterVNet',Subscription1_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'O', Subscription_g, '')), Subscription2 = iif(FlowType_s == 'InterVNet', Subscription2_g, iif(FlowType_s == 'IntraVNet' or FlowDirection_s == 'I', Subscription_g, '')) | extend NIC1 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC1_s, iif(FlowDirection_s == 'O', NIC_s, '')), NIC2 = iif(FlowType_s in ('InterVNet', 'IntraVNet'), NIC2_s, iif(FlowDirection_s == 'I', NIC_s, '')) | extend SrcIP = iif(isnotempty(SrcIP_s), SrcIP_s, iif(FlowDirection_s == 'O', VMIP_s, '')), Destination = iif(isnotempty(DestIP_s), DestIP_s, iif(FlowDirection_s == 'I', VMIP_s, '')) | extend CountryOrRegion = iif(FlowType_s == 'AzurePublic', AzureRegion_s, Country_s) | extend FlowDirection_s = iif(FlowType_s in ('InterVNet','IntraVNet'), '', FlowDirection_s) | where FlowDirection_s == 'I' | summarize DeniedInFlows = sum(DeniedInFlows_d) by L7Protocol = strcat(L7Protocol_s, ' (', toint(DestPort_d), ')')  | sort by DeniedInFlows desc | limit 10",
+          "size": 0,
+          "title": "Denied malicious traffic, by application port",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "piechart"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "33",
+        "name": "DeniedMaliciousTrafficApplicationPortQuery"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## NSG rule hits by malicious traffic"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "name": "NSGHitsMaliciousTrafficTitle"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend nsgList = split(NSGList_s, ' ') | extend nsgRuleList = split(NSGRules_s, ' ') | mvexpand nsgRule = nsgRuleList | extend nsgRuleSplit = split(nsgRule, '|') | extend nsg = tostring(nsgList[toint(nsgRuleSplit[0])]), rule = tostring(nsgRuleSplit[1]), countHits = nsgRuleSplit[4], direction = tostring(nsgRuleSplit[2]) | extend prefixStrippedRule = replace('defaultrule_','', replace('userrule_','', rule)) | extend completeNsgRule = strcat(nsg, '/', prefixStrippedRule) | where direction == 'I' and FlowStatus_s  == 'A' | summarize rule_hits = sum(toint(countHits)) by nsg, rule, Source = iif(isempty(SrcIP_s), 'N/A', SrcIP_s), Destination = iif(isempty(DestIP_s), 'N/A', DestIP_s), Country = iif(isempty(Country_s), 'N/A', Country_s), Region = iif(isempty(Region_s), 'N/A', Region_s), Subnet = iif(isempty(Subnet_s), 'N/A', Subnet_s), NIC = iif(isempty(NIC_s), 'N/A', NIC_s) | summarize TotalHits = sum(rule_hits) by FullRule = strcat(nsg, '/', rule) | sort by TotalHits desc",
+          "size": 0,
+          "title": "NSG rules allowing inbound malicious traffic",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "categoricalbar"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "40",
+        "name": "NSGAllowingInboundMaliciousTrafficBarQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend nsgList = split(NSGList_s, ' ') | extend nsgRuleList = split(NSGRules_s, ' ') | mvexpand nsgRule = nsgRuleList | extend nsgRuleSplit = split(nsgRule, '|') | extend nsg = tostring(nsgList[toint(nsgRuleSplit[0])]), rule = tostring(nsgRuleSplit[1]), countHits = nsgRuleSplit[4], direction = tostring(nsgRuleSplit[2]) | extend prefixStrippedRule = replace('defaultrule_','', replace('userrule_','', rule)) | extend completeNsgRule = strcat(nsg, '/', prefixStrippedRule) | where direction == 'I' and FlowStatus_s  == 'A' | summarize rule_hits = sum(toint(countHits)) by nsg, rule, Source = iif(isempty(SrcIP_s), 'N/A', SrcIP_s), Destination = iif(isempty(DestIP_s), 'N/A', DestIP_s), Country = iif(isempty(Country_s), 'N/A', Country_s), Region = iif(isempty(Region_s), 'N/A', Region_s), Subnet = iif(isempty(Subnet_s), 'N/A', Subnet_s), NIC = iif(isempty(NIC_s), 'N/A', NIC_s) | summarize TotalHits = sum(rule_hits) by nsg, rule | sort by TotalHits desc | extend nsg = strcat('/subscriptions/', split(nsg, '/')[0], '/resourceGroups/', split(nsg, '/')[1], '/providers/Microsoft.Network/networkSecurityGroups/', split(nsg, '/')[2])",
+          "size": 0,
+          "title": "NSG rules allowing inbound malicious traffic",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "TotalHits",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "red",
+                  "showIcon": true
+                }
+              }
+            ]
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "60",
+        "name": "NSGAllowingInboundMaliciousTrafficQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend nsgList = split(NSGList_s, ' ') | extend nsgRuleList = split(NSGRules_s, ' ') | mvexpand nsgRule = nsgRuleList | extend nsgRuleSplit = split(nsgRule, '|') | extend nsg = tostring(nsgList[toint(nsgRuleSplit[0])]), rule = tostring(nsgRuleSplit[1]), countHits = nsgRuleSplit[4], direction = tostring(nsgRuleSplit[2]) | extend prefixStrippedRule = replace('defaultrule_','', replace('userrule_','', rule)) | extend completeNsgRule = strcat(nsg, '/', prefixStrippedRule) | where direction == 'I' and FlowStatus_s  == 'D' | summarize rule_hits = sum(toint(countHits)) by nsg, rule, Source = iif(isempty(SrcIP_s), 'N/A', SrcIP_s), Destination = iif(isempty(DestIP_s), 'N/A', DestIP_s), Country = iif(isempty(Country_s), 'N/A', Country_s), Region = iif(isempty(Region_s), 'N/A', Region_s), Subnet = iif(isempty(Subnet_s), 'N/A', Subnet_s), NIC = iif(isempty(NIC_s), 'N/A', NIC_s) | summarize TotalHits = sum(rule_hits) by FullRule = strcat(nsg, '/', rule) | sort by TotalHits desc",
+          "size": 0,
+          "title": "NSG rules denying inbound malicious traffic",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "visualization": "categoricalbar"
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "40",
+        "name": "NSGDenyingInboundMaliciousTrafficBarQuery"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureNetworkAnalytics_CL | where SubType_s == 'FlowLog' | extend NSG = tostring(split(NSGList_s, '/')[-1]) | where ('{Resource:label}' !has ',' and NSG =~ '{Resource:label}') or ('{Resource:label}' has ',' and NSG in~ (split('{Resource:label}', ', '))) | where FASchemaVersion_s == '2' and FlowType_s == 'MaliciousFlow' | extend nsgList = split(NSGList_s, ' ') | extend nsgRuleList = split(NSGRules_s, ' ') | mvexpand nsgRule = nsgRuleList | extend nsgRuleSplit = split(nsgRule, '|') | extend nsg = tostring(nsgList[toint(nsgRuleSplit[0])]), rule = tostring(nsgRuleSplit[1]), countHits = nsgRuleSplit[4], direction = tostring(nsgRuleSplit[2]) | extend prefixStrippedRule = replace('defaultrule_','', replace('userrule_','', rule)) | extend completeNsgRule = strcat(nsg, '/', prefixStrippedRule) | where direction == 'I' and FlowStatus_s  == 'D' | summarize rule_hits = sum(toint(countHits)) by nsg, rule, Source = iif(isempty(SrcIP_s), 'N/A', SrcIP_s), Destination = iif(isempty(DestIP_s), 'N/A', DestIP_s), Country = iif(isempty(Country_s), 'N/A', Country_s), Region = iif(isempty(Region_s), 'N/A', Region_s), Subnet = iif(isempty(Subnet_s), 'N/A', Subnet_s), NIC = iif(isempty(NIC_s), 'N/A', NIC_s) | summarize TotalHits = sum(rule_hits) by nsg, rule | sort by TotalHits desc | extend nsg = strcat('/subscriptions/', split(nsg, '/')[0], '/resourceGroups/', split(nsg, '/')[1], '/providers/Microsoft.Network/networkSecurityGroups/', split(nsg, '/')[2])",
+          "size": 0,
+          "title": "NSG rules denying inbound malicious traffic",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{Workspaces}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "TotalHits",
+                "formatter": 4,
+                "formatOptions": {
+                  "palette": "blue",
+                  "showIcon": true
+                }
+              }
+            ]
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "MaliciousTraffic"
+        },
+        "customWidth": "60",
+        "name": "NSGDenyingInboundMaliciousTrafficQuery"
+      }
+    ],
+    "fallbackResourceIds": [
+      "Azure Monitor"
+    ],
+    "fromTemplateId": "sentinel-AzureNetworkWatcher",
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
+}

@@ -1,6 +1,4 @@
-targetScope = 'subscription'
-
-//var tenantId = tenant().tenantId
+targetScope= 'managementGroup'
 
 var defaultTags = {
   ArchitectureName: 'vdc'
@@ -8,7 +6,11 @@ var defaultTags = {
   ConfigVersion: configVersion
 }
 
+// Standard Architecture  Parameters
 
+param configVersion string = '0.0.0.1'
+
+@description('Define the Primary Location to Deploy the Architecture')
 @allowed([
   'centralus'
   'eastasia'
@@ -48,11 +50,23 @@ var defaultTags = {
   'australiacentral2'
   ])
 param location string = 'westeurope'
+
 @description('Tag resource with custom tags.')
 param tags object = {}
 
-param subMon string
-param configVersion string = '0.0.0.1'
+// Architecutre Specific Parameters (Defaults Recommended)
+
+@description('Monitoring and Management Landing Zone Subscription ID')
+param subscriptionIdMon string
+
+@description('Address Prefix for the Virtual Hub')
+param hubAddressPrefix string
+
+@description('Virtual Router Atonimic System Number (ASN) for BGP peering')
+param hubVirtualRouterAsn int
+
+@description('Virtual Router assigned IP Addresses')
+param hubVirtualRouterIps array
 
 
 @description('Name of the Group which are to receive Error related mails')
@@ -90,9 +104,10 @@ resource mgGDC 'Microsoft.Management/managementGroups@2021-04-01' = {
 
 
 // module deployed at subscription level but in a different subscription
+
 module managementService '../../services/management/management.bicep' = {
-  name: 'res.management'
-  scope: subscription(subMon)
+  name: 'p.management'
+  scope: subscription(subscriptionIdMon)
   params: {
     location: location
     tags: objResTags
@@ -106,3 +121,55 @@ module managementService '../../services/management/management.bicep' = {
     actionGroupForInfomationEmail: actionGroupForInfomationEmail
   }
 }
+
+
+
+module vWanHub '../../services/NetworkHubs/vWanHub.bicep' = {
+  scope: subscription(subscriptionIdMon)
+  name: 'p.vwanhub'
+  params: {
+    location: location
+    tags: objResTags
+    resWorkspaceId: managementService.outputs.workspaceId
+    addressPrefix: hubAddressPrefix
+    virtualRouterAsn: hubVirtualRouterAsn
+    virtualRouterIps: hubVirtualRouterIps
+  }
+}
+
+
+
+module governance '../../services/management/policy.bicep' = {
+  name: 'gov.policies'
+  params: {
+    actionGroupId: managementService.outputs.actionGroupErrorsId
+    actionGroupRG: managementService.outputs.actionGroupErrorsRG
+    actionGroupName: managementService.outputs.actionGroupErrorsName
+    metricAlertResourceNamespace:	'Microsoft.Network/loadBalancers'
+    metricAlertName:	'DipAvailability'
+    metricAlertDimension1:	'ProtocolType'
+    metricAlertDimension2:	'FrontendIPAddress'
+    metricAlertDimension3:	'BackendIPAddress'
+    metricAlertDescription:	'Average Load Balancer health probe status per time duration'
+    metricAlertSeverity:	'2'
+    metricAlertEnabled:	'true'
+    metricAlertEvaluationFrequency:	'PT15M'
+    metricAlertWindowSize:	'PT1H'
+    metricAlertSensitivity:	'Medium'
+    metricAlertOperator:	'LessThan'
+    metricAlertTimeAggregation:	'Average'
+    metricAlertCriterionType:	'DynamicThresholdCriterion'
+    metricAlertAutoMitigate:	'true'
+  }
+}
+
+/*
+    resourceGroupName:	'BicepExampleRG'
+    resourceGrouplocation:	'australiaeast'
+    actionGroupEnabled:	true
+    actionGroupShortName:	'bicepag'
+    actionGroupEmailName:	'jloudon'
+    actionGroupEmail:	'jesse.loudon@lab3.com.au'
+    actionGroupAlertSchema:	true
+    assignmentEnforcementMode:	'Default'
+*/

@@ -1,0 +1,137 @@
+{ // VDC Update Report
+  "displayName": "VDC Update Report",
+  "content": {
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "Update\n| distinct ResourceId, Computer\n| project ['Computers in Workspace']=ResourceId, ['_ComputerName_']=Computer",
+          "size": 1,
+          "title": "Select Computer",
+          "exportFieldName": "_ComputerName_",
+          "exportParameterName": "ComputerName",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "Virtual Machines",
+                "formatter": 0,
+                "formatOptions": {
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "_ComputerName_",
+                "formatter": 5,
+                "formatOptions": {
+                  "showIcon": true
+                }
+              }
+            ],
+            "filter": true
+          }
+        },
+        "name": "query - 2"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "Update\r\n| where Computer == '{ComputerName}'\r\n| where UpdateState !in ('Installed', 'NotNeeded')\r\n| project-away TimeGenerated, SourceComputerId, Computer, SubscriptionId, ResourceGroup, ResourceProvider, Resource, TenantId\r\n| distinct *\r\n| project ['Update Text']=iff(isempty(OSType),Title , strcat(Product, ' - ', ProductVersion)), Classification, UpdateState",
+          "size": 1,
+          "title": "Required updates",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "conditionalVisibility": {
+          "parameterName": "ComputerName",
+          "comparison": "isNotEqualTo",
+          "value": "\"\""
+        },
+        "name": "query - 2"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "Update\r\n| where OSType != 'Linux'\r\n| sort by TimeGenerated desc\r\n| project-away TimeGenerated, SourceComputerId, SubscriptionId, ResourceGroup, ResourceProvider, ResourceType, Type, SourceSystem, ManagementGroupName\r\n| extend ['KBarticle']= strcat('https://support.microsoft.com/en-us/search?query=KB', KBID) \r\n| distinct Title, Classification, KBarticle",
+          "size": 0,
+          "title": "All Windows updates",
+          "exportFieldName": "Title",
+          "exportParameterName": "UpdateTitle",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "Title",
+                "formatter": 0,
+                "formatOptions": {
+                  "showIcon": true
+                }
+              },
+              {
+                "columnMatch": "KBarticle",
+                "formatter": 7,
+                "formatOptions": {
+                  "linkTarget": "Url",
+                  "showIcon": true
+                }
+              }
+            ],
+            "filter": true
+          }
+        },
+        "customWidth": "50",
+        "name": "query - 3"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "Update\r\n| where OSType == 'Linux'\r\n| sort by TimeGenerated desc \r\n| distinct Product, ProductVersion",
+          "size": 0,
+          "title": "All Linux updates",
+          "exportedParameters": [
+            {
+              "fieldName": "Product",
+              "parameterName": "UpdateProduct",
+              "parameterType": 1
+            },
+            {
+              "fieldName": "ProductVersion",
+              "parameterName": "UpdateProductVersion",
+              "parameterType": 1
+            }
+          ],
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "gridSettings": {
+            "filter": true
+          }
+        },
+        "customWidth": "50",
+        "name": "query - 4"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "Update\r\n| where Title == '{UpdateTitle}'\r\n| distinct Computer, UpdateState\r\n| sort by UpdateState",
+          "size": 0,
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "customWidth": "50",
+        "name": "query - 5"
+      }
+    ],
+    "fallbackResourceIds": [
+      "Azure Monitor"
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
+}

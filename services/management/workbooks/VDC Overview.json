@@ -1,0 +1,272 @@
+{
+  "displayName": "VDC Overview",
+  "content": {
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 9,
+        "content": {
+          "version": "KqlParameterItem/1.0",
+          "parameters": [
+            {
+              "id": "a4b69c01-2263-4ada-8d9c-43433b739ff3",
+              "version": "KqlParameterItem/1.0",
+              "isRequired": true,
+              "type": 4,
+              "name": "TimeRange",
+              "label": "Time range",
+              "value": {
+                "durationMs": 14400000
+              },
+              "resourceType": "microsoft.insights/components",
+              "typeSettings": {
+                "selectableValues": [
+                  {
+                    "durationMs": 300000
+                  },
+                  {
+                    "durationMs": 900000
+                  },
+                  {
+                    "durationMs": 1800000
+                  },
+                  {
+                    "durationMs": 3600000
+                  },
+                  {
+                    "durationMs": 14400000
+                  },
+                  {
+                    "durationMs": 43200000
+                  },
+                  {
+                    "durationMs": 86400000
+                  },
+                  {
+                    "durationMs": 172800000
+                  },
+                  {
+                    "durationMs": 259200000
+                  },
+                  {
+                    "durationMs": 604800000
+                  },
+                  {
+                    "durationMs": 1209600000
+                  },
+                  {
+                    "durationMs": 2419200000
+                  },
+                  {
+                    "durationMs": 2592000000
+                  },
+                  {
+                    "durationMs": 5184000000
+                  },
+                  {
+                    "durationMs": 7776000000
+                  }
+                ]
+              }
+            },
+            { 
+              "id": "c4d8d055-6dbe-451b-bf64-2be8d9e21fd8",
+              "version": "KqlParameterItem/1.0",
+              "isRequired": true,
+              "type": 2,
+              "name": "TimeStep",
+              "label": "Step",
+              "query": "{\"version\":\"1.0.0\",\"content\":\"[\\r\\n    { \\\"value\\\":\\\"1m\\\", \\\"label\\\":\\\"1 minute\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"5m\\\", \\\"label\\\":\\\"5 minutes\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"30m\\\", \\\"label\\\":\\\"30 minutes\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"1h\\\", \\\"label\\\":\\\"1 hour\\\", \\\"selected\\\":true },\\r\\n    { \\\"value\\\":\\\"2h\\\", \\\"label\\\":\\\"2 hours\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"8h\\\", \\\"label\\\":\\\"8 hours\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"1d\\\", \\\"label\\\":\\\"1 day\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"2d\\\", \\\"label\\\":\\\"2 days\\\", \\\"selected\\\":false },\\r\\n    { \\\"value\\\":\\\"7d\\\", \\\"label\\\":\\\"7 days\\\", \\\"selected\\\":false }\\r\\n]\"}",
+              "queryType": 8,
+              "typeSettings": {
+                "additionalResourceOptions": []
+              }
+            },
+            {
+              "name": "TopN",
+              "timeContextFromParameter": "TimeRange",
+              "typeSettings": {
+                "additionalResourceOptions": []
+              },
+              "jsonData": "[\r\n    { \"value\":\"5\", \"label\":\"5 VMs\", \"selected\":true },\r\n    { \"value\":\"10\", \"label\":\"10 VMs\", \"selected\":false },\r\n    { \"value\":\"15\", \"label\":\"15 VMs\",\"selected\":false },\r\n    { \"value\":\"20\", \"label\":\"20 VMs\", \"selected\":false },\r\n    { \"value\":\"30\", \"label\":\"30 VMs\", \"selected\":false },\r\n    { \"value\":\"50\", \"label\":\"50 VMs\", \"selected\":false }\r\n]",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "version": "KqlParameterItem/1.0",
+              "id": "661b58db-c99e-47e8-9cb2-82794c858065",
+              "type": 2,
+              "label": "Top  N"
+            }
+          ],
+          "style": "pills",
+          "queryType": 8,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "name": "parameters - 2"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## Firewall stats"
+        },
+        "name": "text - 6"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureMetrics\r\n| where MetricName == 'DataProcessed' \r\n| make-series Trend=(sum(Total/1000000000)) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeStep} by Resource",
+          "size": 1,
+          "title": "Data processed by Firewall in GB",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "timechart"
+        },
+        "customWidth": "35",
+        "name": "query - 1"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureMetrics\r\n| where MetricName == 'NetworkRuleHit' or MetricName == 'ApplicationRuleHit'\r\n| make-series Trend=(avg(Total)) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeStep} by MetricName, Resource",
+          "size": 1,
+          "title": "Rule hits on Firewall",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "timechart"
+        },
+        "customWidth": "35",
+        "name": "query - 3"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AzureMetrics \r\n| where MetricName == 'FirewallHealth' \r\n| make-series Trend=(avg(Average)) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeStep} by Resource",
+          "size": 1,
+          "aggregation": 3,
+          "title": "Firewall Health %",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "timechart",
+          "tileSettings": {
+            "showBorder": false,
+            "titleContent": {
+              "columnMatch": "Resource",
+              "formatter": 1
+            },
+            "leftContent": {
+              "formatOptions": {
+                "palette": "auto"
+              },
+              "numberFormat": {
+                "unit": 17,
+                "options": {
+                  "maximumSignificantDigits": 3,
+                  "maximumFractionDigits": 2
+                }
+              },
+              "formatter": 12,
+              "columnMatch": "max_Maximum"
+            }
+          },
+          "graphSettings": {
+            "centerContent": {
+              "numberFormat": {
+                "unit": 17,
+                "options": {
+                  "maximumSignificantDigits": 3,
+                  "maximumFractionDigits": 2
+                }
+              },
+              "formatter": 1,
+              "columnMatch": "max_Maximum"
+            },
+            "type": 0,
+            "topContent": {
+              "columnMatch": "Resource",
+              "formatter": 1
+            }
+          }
+        },
+        "customWidth": "30",
+        "name": "query - 3"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## VM stats"
+        },
+        "name": "text - 5"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "InsightsMetrics\r\n| where Namespace == 'Processor' and Name == 'UtilizationPercentage'\r\n| make-series Trend=(avg(Val)) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeStep} by Computer\r\n| join (\r\n   InsightsMetrics\r\n   | where TimeGenerated {TimeRange:query}\r\n   | where Namespace == 'Processor' and Name == 'UtilizationPercentage'\r\n   | summarize avg(Val) by Computer\r\n   | top {TopN} by Computer asc nulls last\r\n) on Computer ",
+          "size": 0,
+          "aggregation": 3,
+          "title": "Top N CPU %",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "timechart"
+        },
+        "name": "query - 4"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "InsightsMetrics\r\n| where Namespace == 'Memory' and Name == 'AvailableMB' | extend maxMem = toreal(parse_json(Tags).['vm.azm.ms/memorySizeMB'])\r\n| extend usedMemPerc = (1-(Val/maxMem))*100\r\n| make-series Trend=avg(usedMemPerc) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeStep} by Computer\r\n| join (\r\n   InsightsMetrics\r\n   | where TimeGenerated {TimeRange:query}\r\n   | where Namespace == 'Memory' and Name == 'AvailableMB'\r\n   | extend maxMem = toreal(parse_json(Tags).['vm.azm.ms/memorySizeMB'])\r\n   | extend usedMemPerc = (1-(Val/maxMem))*100\r\n   | summarize avg(usedMemPerc) by Computer\r\n   | top {TopN} by Computer asc nulls last\r\n) on Computer  ",
+          "size": 0,
+          "aggregation": 3,
+          "title": "Top N Memory usage %",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "timechart"
+        },
+        "name": "query - 7"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "InsightsMetrics\r\n| where Namespace == 'LogicalDisk' and Name == 'FreeSpacePercentage' \r\n| extend dskMount = tostring(parse_json(Tags).['vm.azm.ms/mountId'])\r\n| extend usedPerc = 100-Val\r\n| extend diskInfo = strcat(dskMount, ' on ', Computer)\r\n| make-series Trend=(avg(usedPerc)) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step {TimeStep} by diskInfo\r\n| join (\r\n   InsightsMetrics\r\n   | where Namespace == 'LogicalDisk' and Name == 'FreeSpacePercentage' \r\n   | extend dskMount = tostring(parse_json(Tags).['vm.azm.ms/mountId'])\r\n   | extend usedPerc = 100-Val\r\n   | extend diskInfo = strcat(dskMount, ' on ', Computer)\r\n   | summarize avg(usedPerc) by diskInfo\r\n   | top {TopN} by avg_usedPerc desc nulls last\r\n) on diskInfo ",
+          "size": 0,
+          "aggregation": 3,
+          "title": "Top N most used disk space %",
+          "timeContext": {
+            "durationMs": 0
+          },
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "timechart",
+          "chartSettings": {}
+        },
+        "name": "query - 9"
+      }
+    ],
+    "fallbackResourceIds": [
+      "Azure Monitor"
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
+}

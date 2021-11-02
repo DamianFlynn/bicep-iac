@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "0.0.0.2",
+  "parameters": {
+    "subscriptionIdMon": {
+      "value": "df56d048-2e20-4ab6-82b7-11643163aa53"
+    },
+    "hubAddressPrefix": {
+      "value": "10.162.0.0/22"
+    },
+    "hubVirtualRouterAsn": {
+      "value": 65515
+    },
+    "hubVirtualRouterIps": {
+      "value" :[
+        "10.162.0.132",
+        "10.162.0.133"
+      ]
+    }
+  }
+}
