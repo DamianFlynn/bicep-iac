@@ -1,0 +1,137 @@
+name: Deploy Storage Account
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # For OIDC
+      contents: write # For release tags
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Azure Login - Default"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+
+      - name: Lint Bicep
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            az bicep build --file ./main.bicep
+
+
+  validate:
+    needs: lint
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # For OIDC
+      contents: write # For release tags
+    steps:
+      - uses: actions/checkout@v3
+
+      
+      - name: "Azure Login - Default"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+
+      - name: Run preflight validation
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: ${{ github.run_number }}
+          resourceGroupName: defender
+          template: ./main.bicep
+          deploymentMode: Validate
+
+  scan-bicep-code:
+    needs: [validate]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # For OIDC
+      contents: write # For release tags
+    steps:
+      - uses: actions/checkout@v3
+
+      
+      - name: "Azure Login - Default"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Run Microsoft Security DevOps
+        uses: microsoft/security-devops-action@latest
+        id: msdo
+        with:
+          categories: 'IaC'
+        
+      # - name: Upload results to Security tab
+      #   uses: github/codeql-action/upload-sarif@v1
+      #   with:
+      #     sarif_file: ${{ steps.msdo.outputs.sarifFile }}
+  
+  preview:
+    needs: scan-bicep-code
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # For OIDC
+      contents: write # For release tags
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Azure Login - Default"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - uses: Azure/cli@v1
+        name: Run what-if
+        with:
+          inlineScript: |
+            az deployment group what-if --resource-group defender --template-file ./main.bicep
+
+  deploy-infra:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # For OIDC
+      contents: write # For release tags
+    environment: Production
+    needs: preview
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Azure Login - Default"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Deploy Bicep Template
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: ${{ github.run_number }}
+          resourceGroupName: defender
+          template: ./main.bicep
+          deploymentMode: Incremental
